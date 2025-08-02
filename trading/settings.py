@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-(-p0!&)gocz2(-9gihe4pemyfug5p5pm4pp2ha(dqe_j&z^6-m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['trading-y6c1.onrender.com']
 
 AUTH_USER_MODEL = 'backend.CustomUser'
 
