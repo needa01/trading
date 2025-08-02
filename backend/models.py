@@ -9,7 +9,8 @@ class CustomUser(AbstractUser):
     title = models.TextField(null=True, blank=True)
     email = models.EmailField(unique=True) 
     created_at = models.DateTimeField(auto_now_add=True,blank=False,null=False)
-
+    class Meta:
+        verbose_name_plural = "User"
 
 
 class Currency(models.Model):
@@ -17,13 +18,16 @@ class Currency(models.Model):
     symbol = models.CharField(max_length=10, unique=True)
     is_crypto = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
+    class Meta:
+        verbose_name_plural = "Currency"
     
-class Balances(models.Model):
+class Balance(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=20, decimal_places=8, default=0)
     currency =models.ForeignKey(Currency, on_delete=models.CASCADE)
     
     class Meta:
+        verbose_name_plural = "Balance"
         unique_together = ('user', 'currency')
         
 class WalletTransaction(models.Model):
@@ -45,6 +49,9 @@ class WalletTransaction(models.Model):
     destination = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        verbose_name_plural = "Wallet Transaction"
 
 # --- 5. Orders ---
 class Order(models.Model):
@@ -73,6 +80,9 @@ class Order(models.Model):
     locked_funds = models.DecimalField(max_digits=20, decimal_places=8, default=0)
     status = models.CharField(max_length=10, choices=OrderStatus.choices, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Order"
 
 # --- 6. Trades ---
 class Trade(models.Model):
@@ -87,6 +97,9 @@ class Trade(models.Model):
     fee_buyer = models.DecimalField(max_digits=20, decimal_places=8, default=0)
     fee_seller = models.DecimalField(max_digits=20, decimal_places=8, default=0)
     traded_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Trade"
 
 # --- 7. Last Traded Price (LTP) ---
 class LastTradedPrice(models.Model):
@@ -97,6 +110,7 @@ class LastTradedPrice(models.Model):
 
     class Meta:
         unique_together = ('base_currency', 'quote_currency')
+        verbose_name_plural = "LTP"
 
 # --- 8. Charges ---
 class Charge(models.Model):
@@ -108,3 +122,4 @@ class Charge(models.Model):
 
     class Meta:
         unique_together = ('base_currency', 'quote_currency')
+        verbose_name_plural = "Charge"
