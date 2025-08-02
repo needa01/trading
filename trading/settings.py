@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import dj_database_url
@@ -27,8 +28,9 @@ SECRET_KEY = 'django-insecure-(-p0!&)gocz2(-9gihe4pemyfug5p5pm4pp2ha(dqe_j&z^6-m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['trading-y6c1.onrender.com']
+ALLOWED_HOSTS = ['trading-y6c1.onrender.com','127.0.0.1']
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 AUTH_USER_MODEL = 'backend.CustomUser'
 
 # Application definition
