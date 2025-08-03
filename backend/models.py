@@ -20,6 +20,9 @@ class Currency(models.Model):
     active = models.BooleanField(default=True)
     class Meta:
         verbose_name_plural = "Currency"
+        
+    def __str__(self):
+        return f"{self.symbol} - {self.name}"
     
 class Balance(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

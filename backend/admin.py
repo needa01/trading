@@ -35,17 +35,59 @@ class WalletTransactionAdmin(admin.ModelAdmin):
         return request.user.is_staff
     
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'type', 'price', 'quantity', 'remaining_quantity', 'status')
+    list_display = ('id', 'user', 'type', 'base_currency', 'quote_currency', 'price', 'quantity', 'remaining_quantity', 'status')
+    exclude = ('user',)  # ✅ Hide user field from the form
+
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.user_id:
+            obj.user = request.user  # ✅ Assign current user
+        obj.save()
+        
+        
+    # 1. Restrict queryset based on user role
     def get_queryset(self, request):
+        qs = super().get_queryset(request)
         if request.user.is_superuser:
-            return Order.objects.none()  # superuser sees nothing
-        return super().get_queryset(request).filter(user=request.user)
+            return Order.objects.none()  # superusers see nothing
+        return qs.filter(user=request.user)
+
+    # 2. Auto-assign the current user and hide user field in form
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.user_id:
+            obj.user = request.user
+        obj.save()
+
+    # 3. Prevent users from seeing or editing `user` field
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if not request.user.is_superuser:
+            if 'user' in form.base_fields:
+                form.base_fields['user'].disabled = True
+        return form
+
+    # 4. Hide fields from form that should be auto-handled
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        readonly += ['locked_funds', 'remaining_quantity']
+        return readonly
+
+    # 5. Control add/change/delete permissions
     def has_change_permission(self, request, obj=None):
         return obj is None or obj.user == request.user
+
     def has_delete_permission(self, request, obj=None):
         return obj is None or obj.user == request.user
+
     def has_add_permission(self, request):
         return request.user.is_staff and not request.user.is_superuser
+
+    # 6. Optional: Limit trading to specific base/quote pairs
+    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    #     if db_field.name == "base_currency":
+    #         kwargs["queryset"] = Currency.objects.filter(symbol__in=["BTC", "ETH"])
+    #     if db_field.name == "quote_currency":
+    #         kwargs["queryset"] = Currency.objects.filter(symbol__in=["INR", "USDT"])
+    #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(Order, OrderAdmin)
 
